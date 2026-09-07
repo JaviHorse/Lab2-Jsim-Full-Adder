@@ -1,0 +1,58 @@
+* LAB #2
+* Group Name: WHATS OUR NAME
+* Members (one per line; sort alphabetically by last name):
+* [Last Name, First Name]
+* [Add remaining members in the same format]
+
+.include "8clocks.jsim"
+.include "nominal.jsim"
+.include "stdcell.jsim"
+
+* We first used De Morgan's law, AB + CDE + FG becomes all NANDs
+* NOT(NOT(AB) NOT(CDE) NOT(FG)).
+* The first three NANDs give NOT(AB), NOT(CDE), and NOT(FG).
+* The last NAND combines the three NANDs so that it simplifies back out to normal so this has 4 gates and 2 levels
+* Basically we have 2 nand2 and 2 nand3 in the composition after DeMorgans
+* nand2 and nand3 we also found in both quickref.pdf and stdcell.jsim
+.subckt fx a b c d e f g out
+Xab a b n_ab nand2
+Xcde c d e n_cde nand3
+Xfg f g n_fg nand2
+Xout n_ab n_cde n_fg out nand3
+.ends
+
+* First we did, p = a XOR b, the we will XOR p with the carry_in because full adder + half adder
+* For the carry output, a carry happens when at least two of the three inputs are 1.
+* This can be written as: carry = AB + p*carry_in
+* formula. Reusing p saves gates, and three NANDs handle the carry.
+* Since p = A XOR B, this gives the correct full-adder carry behavior.
+* 
+* XOR gates are used for the sum because they implement the required sum operation
+* with fewer gates, compared to rebuilding the XR using only NAND/NOR/NOT gates
+* NAND gates are then used for the carry because they can implement the required
+* AND/OR behavior efficiently using De Morgan's Law
+.subckt fa a b carry_in sum carry
+Xp a b p xor2
+Xsum p carry_in sum xor2
+Xab a b n_ab nand2
+Xpc p carry_in n_pc nand2
+Xcarry n_ab n_pc carry nand2
+.ends
+
+Xfx clk1 clk2 clk3 clk4 clk5 clk6 clk7 OUT fx
+Xfa clk1 clk2 clk3 sum carry fa
+
+* From quickref, a clock period is 2*tstable + tAtoB + tBtoA.
+* For clk7, this is 2*319.9ns + 0.1ns + 0.1ns = 640ns.
+* Run for 640ns so the plots cover one full cycle of clk7.
+.tran 640ns
+.plot clk1
+.plot clk2
+.plot clk3
+.plot clk4
+.plot clk5
+.plot clk6
+.plot clk7
+.plot OUT
+.plot sum
+.plot carry
