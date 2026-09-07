@@ -1,8 +1,9 @@
 * LAB #2
 * Group Name: WHATS OUR NAME
-* Members (one per line; sort alphabetically by last name):
-* [Last Name, First Name]
-* [Add remaining members in the same format]
+* Members:
+* MACASAET, Javier Dexter D.
+* REYES, Kyle Andrei
+* TAN, Hans Daniel
 
 .include "8clocks.jsim"
 .include "nominal.jsim"
